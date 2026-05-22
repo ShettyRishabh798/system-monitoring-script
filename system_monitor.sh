@@ -48,3 +48,72 @@ echo "====================================================="
 echo "Thresholds set — Disk: ${DISK_THRESHOLD}%  Memory: ${MEMORY_THRESHOLD}%"
 echo ""
 echo "Script is ready. Features coming soon..."
+
+
+# -----------------------------------------------------------------------------
+# FUNCTIONS — Each monitoring feature will be its own function
+# -----------------------------------------------------------------------------
+
+# Function to print a section header
+print_header() {
+    echo ""
+    echo "============================================="
+    echo "  $1"
+    echo "============================================="
+}
+
+# Function to log a message to the log file with a timestamp
+log_alert() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
+}
+
+# -----------------------------------------------------------------------------
+# FEATURE 1 — Disk Usage Monitor
+# -----------------------------------------------------------------------------
+check_disk_usage() {
+    print_header "DISK USAGE MONITOR"
+
+    # df -H shows disk usage in human-readable sizes
+    # We skip the first header line with 'tail -n +2'
+    # awk extracts the Use% column (column 5) and the mount point (column 6)
+    df -H | tail -n +2 | awk '{print $5, $6}' | while read -r usage mount; do
+
+        # Remove the % sign so we can compare it as a number
+        usage_num=${usage%%%}
+
+        # Only process lines where usage is actually a number
+        # (some special filesystems return non-numeric values)
+        if [[ "$usage_num" =~ ^[0-9]+$ ]]; then
+
+            if [ "$usage_num" -ge "$DISK_THRESHOLD" ]; then
+                # ALERT — usage is at or above threshold
+                echo -e "${RED}[ALERT] Disk usage on $mount is at ${usage} — exceeds threshold of ${DISK_THRESHOLD}%${NC}"
+                log_alert "DISK ALERT: $mount is at ${usage} (threshold: ${DISK_THRESHOLD}%)"
+            else
+                # OK — usage is below threshold
+                echo -e "${GREEN}[OK]    Disk usage on $mount is at ${usage}${NC}"
+            fi
+
+        fi
+    done
+}
+
+# -----------------------------------------------------------------------------
+# MAIN — This is where the script starts executing
+# -----------------------------------------------------------------------------
+
+echo ""
+echo "====================================================="
+echo "       SYSTEM MONITOR — $(date '+%Y-%m-%d %H:%M:%S')"
+echo "====================================================="
+echo "Thresholds set — Disk: ${DISK_THRESHOLD}%  Memory: ${MEMORY_THRESHOLD}%"
+
+# Call the disk usage function
+check_disk_usage
+
+echo ""
+echo "====================================================="
+echo "  Monitoring complete. Log saved to: $LOG_FILE"
+echo "====================================================="
+echo ""
+
