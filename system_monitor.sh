@@ -148,6 +148,31 @@ check_top_processes() {
 }
 
 # -----------------------------------------------------------------------------
+# FEATURE 4 — Run Summary
+# -----------------------------------------------------------------------------
+print_summary() {
+    print_header "RUN SUMMARY"
+
+    # Count total number of alert lines ever written to the log file
+    if [ -f "$LOG_FILE" ]; then
+        total_logged=$(wc -l < "$LOG_FILE")
+    else
+        total_logged=0
+    fi
+
+    echo "Alerts fired this run  : ${ALERT_COUNT}"
+    echo "Total alerts in log    : ${total_logged}"
+    echo "Log file location      : $(pwd)/${LOG_FILE}"
+    echo ""
+
+    if [ "$ALERT_COUNT" -gt 0 ]; then
+        echo -e "${RED}  *** ACTION REQUIRED — ${ALERT_COUNT} alert(s) detected ***${NC}"
+    else
+        echo -e "${GREEN}  *** ALL SYSTEMS OK — No alerts this run ***${NC}"
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # MAIN — This is where the script starts executing
 # -----------------------------------------------------------------------------
 
