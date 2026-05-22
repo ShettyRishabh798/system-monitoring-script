@@ -5,8 +5,8 @@
 # Description : Monitors disk, memory, and CPU usage on a Linux system.
 #               Displays alerts when usage crosses defined thresholds.
 #               Logs all alerts to a log file with timestamps.
-# Author      : Your Name
-# Created     : $(date +%Y-%m-%d)
+# Author      : Rishabh Shetty
+# Created     : 22 May 2026
 # =============================================================================
 
 # -----------------------------------------------------------------------------
