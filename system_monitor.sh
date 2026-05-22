@@ -124,7 +124,28 @@ check_memory_usage() {
         echo -e "${GREEN}[OK]    Memory usage is at ${mem_usage_percent}% — within safe limits${NC}"
     fi
 }
+# -----------------------------------------------------------------------------
+# FEATURE 3 — Top CPU and Memory Consuming Processes
+# -----------------------------------------------------------------------------
+check_top_processes() {
+    print_header "TOP ${CPU_TOP_COUNT} CPU-CONSUMING PROCESSES"
 
+    # ps aux lists all processes
+    # --sort=-%cpu sorts by CPU usage descending
+    # head -n pulls the header + top N processes
+    # awk formats the output into readable columns
+    echo -e "${YELLOW}%-10s %-6s %-6s %-6s %s${NC}" "USER" "PID" "%CPU" "%MEM" "COMMAND"
+    echo "------------------------------------------------------"
+    ps aux --sort=-%cpu | tail -n +2 | head -n "$CPU_TOP_COUNT" | \
+        awk '{printf "%-10s %-6s %-6s %-6s %s\n", $1, $2, $3, $4, $11}'
+
+    print_header "TOP ${CPU_TOP_COUNT} MEMORY-CONSUMING PROCESSES"
+
+    echo -e "${YELLOW}%-10s %-6s %-6s %-6s %s${NC}" "USER" "PID" "%CPU" "%MEM" "COMMAND"
+    echo "------------------------------------------------------"
+    ps aux --sort=-%mem | tail -n +2 | head -n "$CPU_TOP_COUNT" | \
+        awk '{printf "%-10s %-6s %-6s %-6s %s\n", $1, $2, $3, $4, $11}'
+}
 
 # -----------------------------------------------------------------------------
 # MAIN — This is where the script starts executing
