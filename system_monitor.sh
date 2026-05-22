@@ -99,6 +99,34 @@ check_disk_usage() {
 }
 
 # -----------------------------------------------------------------------------
+# FEATURE 2 — Memory Usage Monitor
+# -----------------------------------------------------------------------------
+check_memory_usage() {
+    print_header "MEMORY USAGE MONITOR"
+
+    # free -m shows memory in megabytes
+    # We grab the 'Mem:' line, then extract total (col 2) and used (col 3)
+    total_mem=$(free -m | awk '/^Mem:/ {print $2}')
+    used_mem=$(free -m | awk '/^Mem:/ {print $3}')
+
+    # Calculate usage percentage (integer division is fine here)
+    mem_usage_percent=$(( used_mem * 100 / total_mem ))
+
+    echo "Total Memory : ${total_mem} MB"
+    echo "Used Memory  : ${used_mem} MB"
+    echo "Usage        : ${mem_usage_percent}%"
+    echo ""
+
+    if [ "$mem_usage_percent" -ge "$MEMORY_THRESHOLD" ]; then
+        echo -e "${RED}[ALERT] Memory usage is at ${mem_usage_percent}% — exceeds threshold of ${MEMORY_THRESHOLD}%${NC}"
+        log_alert "MEMORY ALERT: Usage is at ${mem_usage_percent}% (threshold: ${MEMORY_THRESHOLD}%)"
+    else
+        echo -e "${GREEN}[OK]    Memory usage is at ${mem_usage_percent}% — within safe limits${NC}"
+    fi
+}
+
+
+# -----------------------------------------------------------------------------
 # MAIN — This is where the script starts executing
 # -----------------------------------------------------------------------------
 
