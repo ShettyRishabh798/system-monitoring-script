@@ -1,0 +1,8 @@
+# Log files — generated at runtime, not part of the codebase
+monitor.log
+*.log
+
+# Temp files created by the alert counter
+/tmp/tmp.*
+
+
